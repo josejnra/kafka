@@ -3,6 +3,7 @@ import random
 
 from confluent_kafka import Producer
 
+topic_name = "users"
 producer = Producer({'bootstrap.servers': 'localhost:9092'})
 size = 1000000
 
@@ -23,7 +24,7 @@ def delivery_report(err, decoded_message, original_message):
 def confluent_producer_async():
     for msg in get_message(size):
         producer.produce(
-            "topic1",
+            topic_name,
             msg,
             callback=lambda err, decoded_message, original_message=msg: delivery_report(  # noqa
                 err, decoded_message, original_message
@@ -35,7 +36,7 @@ def confluent_producer_async():
 def confluent_producer_sync():
     for msg in get_message(size):
         producer.produce(
-            "topic1",
+            topic_name,
             msg,
             callback=lambda err, decoded_message, original_message=msg: delivery_report(  # noqa
                 err, decoded_message, original_message
