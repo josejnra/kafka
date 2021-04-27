@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.0.1
+    image: confluentinc/cp-zookeeper:6.1.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker1:
-    image: confluentinc/cp-server:6.0.1
+    image: confluentinc/cp-server:6.1.1
     hostname: broker1
     container_name: broker1
     depends_on:
@@ -42,7 +42,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   broker2:
-    image: confluentinc/cp-server:6.0.1
+    image: confluentinc/cp-server:6.1.1
     hostname: broker2
     container_name: broker2
     depends_on:
@@ -71,7 +71,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.0.1
+    image: confluentinc/cp-schema-registry:6.1.1
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
@@ -85,7 +85,7 @@ services:
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:6.0.1
+    image: confluentinc/cp-enterprise-control-center:6.1.1
     hostname: control-center
     container_name: control-center
     depends_on:
@@ -107,7 +107,7 @@ services:
       PORT: 9021
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.0.1
+    image: confluentinc/cp-ksqldb-server:6.1.1
     hostname: ksqldb-server
     container_name: ksqldb-server
     depends_on:
@@ -130,7 +130,7 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:6.0.1
+    image: confluentinc/cp-ksqldb-cli:6.1.1
     container_name: ksqldb-cli
     depends_on:
       - broker1
