@@ -90,14 +90,14 @@ Before deleting a stream make sure you have terminated all the queries that are 
 drop stream stream_name;
 ```
 
-#### Print eventos from stream
+#### Print events from stream
 ```shell
 print stream_name;
 ```
 
 
-### Outros
-#### Verificar log de qualquer um dos serviços da Confluent Platform
+### Others
+#### Check any log from any service from Confluent Platform
 ```shell
 $ journalctl -u confluent-kafka-connect
 ```
