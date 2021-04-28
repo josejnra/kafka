@@ -5,7 +5,7 @@ from uuid import uuid1
 from confluent_kafka import Producer
 
 topic_name = "users"
-producer = Producer({'bootstrap.servers': 'localhost:9092'})
+producer = Producer({'bootstrap.servers': 'localhost:9092,localhost:9192'})
 size = 1000000
 
 
