@@ -1,5 +1,6 @@
 import json
 import random
+from uuid import uuid1
 
 from confluent_kafka import Producer
 
@@ -13,7 +14,7 @@ def get_message(size: int) -> bytes:
         yield json.dumps({
             "nome": random.choice(["john", "alex", "jack", "whindersson"]),
             "id": random.randint(1, 1000)
-        }).encode()
+        }).encode('utf-8')
 
 
 def delivery_report(err, decoded_message, original_message):
@@ -38,6 +39,7 @@ def confluent_producer_sync():
         producer.produce(
             topic_name,
             msg,
+            key=str(uuid1(random.randint(1, 10000))),
             callback=lambda err, decoded_message, original_message=msg: delivery_report(  # noqa
                 err, decoded_message, original_message
             ),
@@ -46,4 +48,4 @@ def confluent_producer_sync():
 
 
 if __name__ == '__main__':
-    confluent_producer_async()
+    confluent_producer_sync()
