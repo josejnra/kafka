@@ -7,7 +7,7 @@ networks:
 services:
 
   kafka-zookeeper:
-    image: confluentinc/cp-zookeeper:6.1.1
+    image: confluentinc/cp-zookeeper:6.2.0
     hostname: kafka-zookeeper
     container_name: kafka-zookeeper
     ports:
@@ -19,7 +19,7 @@ services:
       - kafka
 
   kafka-broker1:
-    image: confluentinc/cp-kafka:6.1.1
+    image: confluentinc/cp-kafka:6.2.0
     hostname: kafka-broker1
     container_name: kafka-broker1
     depends_on:
@@ -43,7 +43,7 @@ services:
       - kafka
 
   kafka-broker2:
-    image: confluentinc/cp-kafka:6.1.1
+    image: confluentinc/cp-kafka:6.2.0
     hostname: kafka-broker2
     container_name: kafka-broker2
     depends_on:
@@ -67,7 +67,7 @@ services:
       - kafka
 
   kafka-schema-registry:
-    image: confluentinc/cp-schema-registry:6.1.1
+    image: confluentinc/cp-schema-registry:6.2.0
     hostname: kafka-schema-registry
     container_name: kafka-schema-registry
     depends_on:
@@ -83,7 +83,7 @@ services:
       - kafka
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.1.1
+    image: confluentinc/cp-ksqldb-server:6.2.0
     hostname: ksqldb-server
     container_name: ksqldb-server
     depends_on:
@@ -92,7 +92,7 @@ services:
     ports:
       - 8088:8088
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
       KSQL_BOOTSTRAP_SERVERS: "kafka-broker1:29092,kafka-broker2:29192"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_LISTENERS: "http://0.0.0.0:8088"
@@ -108,7 +108,7 @@ services:
       - kafka
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:6.1.1
+    image: confluentinc/cp-ksqldb-cli:6.2.0
     container_name: ksqldb-cli
     depends_on:
       - kafka-broker1
@@ -120,7 +120,7 @@ services:
       - kafka
 
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:6.1.1
+    image: confluentinc/cp-kafka-connect:6.2.0
     container_name: kafka-connect
     depends_on:
       - kafka-broker1
