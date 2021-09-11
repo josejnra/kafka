@@ -17,7 +17,7 @@ CREATE STREAM riderLocations (profileId VARCHAR, latitude DOUBLE, longitude DOUB
 * __kafka_topic__: Name of the Kafka topic underlying the stream. The topic to read from. 
   In this case it will be automatically created because it doesn't exist yet,
   but streams may also be created over topics that already exist.
-  
+
 * __value_format__ - Encoding of the messages stored in the Kafka topic. For JSON encoding, 
   each row will be stored as a JSON object whose keys/values are column names/values.
   For example: 
