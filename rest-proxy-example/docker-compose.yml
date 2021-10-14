@@ -1,7 +1,9 @@
 version: '3.7'
+
 services:
+
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:6.2.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -11,7 +13,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka0:
-    image: confluentinc/cp-server:6.2.0
+    image: confluentinc/cp-server:6.2.1
     hostname: kafka0
     container_name: kafka0
     depends_on:
@@ -41,7 +43,7 @@ services:
       KAFKA_KAFKA_REST_ACCESS_CONTROL_ALLOW_HEADERS: origin,content-type,accept,authorization
 
   kafka1:
-    image: confluentinc/cp-server:6.2.0
+    image: confluentinc/cp-server:6.2.1
     hostname: kafka1
     container_name: kafka1
     depends_on:
@@ -66,7 +68,7 @@ services:
       KAFKA_CONFLUENT_SUPPORT_CUSTOMER_ID: anonymous
 
   kafka2:
-    image: confluentinc/cp-server:6.2.0
+    image: confluentinc/cp-server:6.2.1
     hostname: kafka2
     container_name: kafka2
     depends_on:

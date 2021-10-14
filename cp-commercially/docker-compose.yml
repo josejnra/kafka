@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:6.2.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -13,11 +13,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker1:
-    image: confluentinc/cp-server:6.2.0
+    image: confluentinc/cp-server:6.2.1
     hostname: broker1
     container_name: broker1
-    depends_on:
-      - zookeeper
     ports:
       - 9092:9092
       - 9101:9101
@@ -40,13 +38,13 @@ services:
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
-
-  broker2:
-    image: confluentinc/cp-server:6.2.0
-    hostname: broker2
-    container_name: broker2
     depends_on:
       - zookeeper
+
+  broker2:
+    image: confluentinc/cp-server:6.2.1
+    hostname: broker2
+    container_name: broker2
     ports:
       - 9093:9093
       - 9102:9102
@@ -69,30 +67,27 @@ services:
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    depends_on:
+      - zookeeper
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.2.0
+    image: confluentinc/cp-schema-registry:6.2.1
     hostname: schema-registry
     container_name: schema-registry
-    depends_on:
-      - broker1
-      - broker2
     ports:
       - 8081:8081
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker1:29092,broker2:29093'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-
-  control-center:
-    image: confluentinc/cp-enterprise-control-center:6.2.0
-    hostname: control-center
-    container_name: control-center
     depends_on:
       - broker1
       - broker2
-      - schema-registry
-      - ksqldb-server
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:6.2.1
+    hostname: control-center
+    container_name: control-center
     ports:
       - 9021:9021
     environment:
@@ -105,14 +100,16 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
-
-  ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.2.0
-    hostname: ksqldb-server
-    container_name: ksqldb-server
     depends_on:
       - broker1
       - broker2
+      - schema-registry
+      - ksqldb-server
+
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:6.2.1
+    hostname: ksqldb-server
+    container_name: ksqldb-server
     ports:
       - 8088:8088
     environment:
@@ -128,13 +125,16 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+    depends_on:
+      - broker1
+      - broker2
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:6.2.0
+    image: confluentinc/cp-ksqldb-cli:6.2.1
     container_name: ksqldb-cli
+    entrypoint: /bin/sh
+    tty: true
     depends_on:
       - broker1
       - broker2
       - ksqldb-server
-    entrypoint: /bin/sh
-    tty: true

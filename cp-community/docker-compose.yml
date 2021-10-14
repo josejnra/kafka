@@ -3,27 +3,26 @@ version: '3.7'
 networks:
   kafka:
 
-
 services:
 
   kafka-zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:6.2.1
     hostname: kafka-zookeeper
     container_name: kafka-zookeeper
+    networks:
+      - kafka
     ports:
       - 2181:2181
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - kafka
 
   kafka-broker1:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:6.2.1
     hostname: kafka-broker1
     container_name: kafka-broker1
-    depends_on:
-      - kafka-zookeeper
+    networks:
+      - kafka
     ports:
       - 29092:29092
       - 9092:9092
@@ -39,15 +38,15 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
-    networks:
-      - kafka
-
-  kafka-broker2:
-    image: confluentinc/cp-kafka:6.2.0
-    hostname: kafka-broker2
-    container_name: kafka-broker2
     depends_on:
       - kafka-zookeeper
+
+  kafka-broker2:
+    image: confluentinc/cp-kafka:6.2.1
+    hostname: kafka-broker2
+    container_name: kafka-broker2
+    networks:
+      - kafka
     ports:
       - 29192:29192
       - 9192:9192
@@ -63,32 +62,31 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
-    networks:
-      - kafka
+    depends_on:
+      - kafka-zookeeper
 
   kafka-schema-registry:
-    image: confluentinc/cp-schema-registry:6.2.0
+    image: confluentinc/cp-schema-registry:6.2.1
     hostname: kafka-schema-registry
     container_name: kafka-schema-registry
-    depends_on:
-      - kafka-broker1
-      - kafka-broker2
+    networks:
+      - kafka
     ports:
       - 8081:8081
     environment:
       SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-broker1:29092,kafka-broker2:29192'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-    networks:
-      - kafka
-
-  ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.2.0
-    hostname: ksqldb-server
-    container_name: ksqldb-server
     depends_on:
       - kafka-broker1
       - kafka-broker2
+
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:6.2.1
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    networks:
+      - kafka
     ports:
       - 8088:8088
     environment:
@@ -104,27 +102,27 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
-    networks:
-      - kafka
+    depends_on:
+      - kafka-broker1
+      - kafka-broker2
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:6.2.0
+    image: confluentinc/cp-ksqldb-cli:6.2.1
     container_name: ksqldb-cli
+    networks:
+      - kafka
+    entrypoint: /bin/sh
+    tty: true
     depends_on:
       - kafka-broker1
       - kafka-broker2
       - ksqldb-server
-    entrypoint: /bin/sh
-    tty: true
-    networks:
-      - kafka
 
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:6.2.0
+    image: confluentinc/cp-kafka-connect:6.2.1
     container_name: kafka-connect
-    depends_on:
-      - kafka-broker1
-      - kafka-broker2
+    networks:
+      - kafka
     ports:
       - 8083:8083
     environment:
@@ -148,5 +146,6 @@ services:
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components,/local-connect-jars,/usr/share/confluent-hub-components/confluentinc-kafka-connect-s3'
       KAFKA_HEAP_OPTS: '-Xmx2G'
-    networks:
-      - kafka
+    depends_on:
+      - kafka-broker1
+      - kafka-broker2
