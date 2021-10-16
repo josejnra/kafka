@@ -63,39 +63,6 @@ $ curl -X POST -H 'Content-Type:application/json' --data @"./connector_config.js
 $ curl -X PUT -H "Content-Type: application/json" --data @"./connector_config.json" localhost:8000/connectors/connector_name/config
 ```
 
-### KSQL
-#### Open Shell
-```shell
-$ sudo ksql http://localhost:8088
-```
-
-#### Queries
-```shell
-show queries;
-```
-
-#### Terminate Query
-```shell
-terminate query_id;
-```
-
-#### Streams
-```shell
-show streams;
-```
-
-#### Delete Stream
-Before deleting a stream make sure you have terminated all the queries that are using it.
-```shell
-drop stream stream_name;
-```
-
-#### Print events from stream
-```shell
-print stream_name;
-```
-
-
 ### Others
 #### Check any log from any service from Confluent Platform
 ```shell
