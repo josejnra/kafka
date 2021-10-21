@@ -51,32 +51,53 @@ docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
 A stream essentially associates a schema with an underlying Kafka topic.
 ```shell
 CREATE STREAM riderLocations (profileId VARCHAR, latitude DOUBLE, longitude DOUBLE)
-  WITH (kafka_topic='locations', value_format='json');
+  WITH (kafka_topic='locations', value_format='json', partitions=1);
 ```
 
-* __kafka_topic__: Name of the Kafka topic underlying the stream. The topic to read from. 
-  In this case it will be automatically created because it doesn't exist yet,
-  but streams may also be created over topics that already exist.
+* __kafka_topic__: Name of the Kafka topic underlying the stream. The topic to read from. In this case it will be automatically created because it doesn't exist yet, but streams may also be created over topics that already exist.
 
-* __value_format__ - Encoding of the messages stored in the Kafka topic. For JSON encoding, 
-  each row will be stored as a JSON object whose keys/values are column names/values.
-  For example: 
-  ```json
-  {
-    "profileId": "c2309eec",
-    "latitude": 37.7877,
-    "longitude": -122.4205
-  }
-  ```
+* __value_format__ - Encoding of the messages stored in the Kafka topic. For JSON encoding, each row will be stored as a JSON object whose keys/values are column names/values. For example: 
+```json
+{
+  "profileId": "c2309eec",
+  "latitude": 37.7877,
+  "longitude": -122.4205
+}
+```
 
-* __partitions__ - Number of partitions to create for the locations topic. 
-  Note that this parameter is not needed for topics that already exist.
+* __partitions__ - Number of partitions to create for the locations topic. Note that this parameter is not needed for topics that already exist.
 
-### Persistent Query
+### Create Materialized Views
+```shell
+CREATE TABLE currentLocation AS
+  SELECT profileId,
+         LATEST_BY_OFFSET(latitude) AS la,
+         LATEST_BY_OFFSET(longitude) AS lo
+  FROM riderlocations
+  GROUP BY profileId
+  EMIT CHANGES;
+```
+
+```shell
+CREATE TABLE ridersNearMountainView AS
+  SELECT ROUND(GEO_DISTANCE(la, lo, 37.4133, -122.1162), -1) AS distanceInMiles,
+         COLLECT_LIST(profileId) AS riders,
+         COUNT(*) AS count
+  FROM currentLocation
+  GROUP BY ROUND(GEO_DISTANCE(la, lo, 37.4133, -122.1162), -1);
+```
+
+### Push Query
 ```shell
 # Within 50 Miles of (-15.411, -45.1162)
 SELECT * FROM riderLocations
 WHERE GEO_DISTANCE(latitude, longitude, -15.411, -45.1162) <= 50 EMIT CHANGES;
+```
+
+### Pull Query
+```shell
+SET 'ksql.query.pull.table.scan.enabled'='true';
+SELECT * from ridersNearMountainView WHERE distanceInMiles <= 10;
 ```
 
 ### Populate Stream
