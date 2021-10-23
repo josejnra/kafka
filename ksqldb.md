@@ -99,6 +99,9 @@ WHERE GEO_DISTANCE(latitude, longitude, -15.411, -45.1162) <= 50 EMIT CHANGES;
 SET 'ksql.query.pull.table.scan.enabled'='true';
 SELECT * from ridersNearMountainView WHERE distanceInMiles <= 10;
 ```
+### Persistent Query
+```shell
+```
 
 ### Populate Stream
 ```shell
@@ -110,7 +113,7 @@ INSERT INTO riderLocations (profileId, latitude, longitude) VALUES ('c2309eec', 
 ksql> list topics extended;
 ```
 
-####Queries
+### Queries
 ```shell
 ksql> show queries;
 ```
@@ -134,6 +137,100 @@ ksql> drop stream stream_name;
 ### Print events from stream
 ```shell
 ksql> print stream_name;
+```
+
+## Data Generator
+Inside ksqldb-server run the following command to generate synthetic test data.
+```shell
+ksql-datagen bootstrap-server=kafka-broker1:29092 schemaRegistryUrl=schema-registry:8081 schema=./userprofile.avro value-format=json key=userid topic=userprofile maxInterval=5000 iterations=10
+```
+where as `userprofile.avro` is:
+```json
+{
+  "namespace": "streams",
+  "name": "userprofile",
+  "type": "record",
+  "fields": [
+    {
+      "name": "userid",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "iteration": {
+            "start": 1000,
+            "step": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "firstname",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "Alice",
+            "Bob",
+            "Carol",
+            "Dan",
+            "Eve",
+            "Frank",
+            "Grace",
+            "Heidi",
+            "Ivan"
+          ]
+        }
+      }
+    },
+    {
+      "name": "lastname",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "Smith",
+            "Jones",
+            "Coen",
+            "Fawcett",
+            "Edison",
+            "Jones",
+            "Dotty"
+          ]
+        }
+      }
+    },
+    {
+      "name": "countrycode",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "AU",
+            "IN",
+            "GB",
+            "US"
+          ]
+        }
+      }
+    },
+    {
+      "name": "rating",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "3.4",
+            "3.9",
+            "2.2",
+            "4.4",
+            "3.7",
+            "4.9"
+          ]
+        }
+      }
+    }
+  ]
+}
 ```
 
 ## Referencies
