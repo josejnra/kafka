@@ -140,10 +140,22 @@ ksql> print stream_name;
 ```
 
 ## Data Generator
-Inside ksqldb-server run the following command to generate synthetic test data.
+Inside ksql-datagen run the following command to generate synthetic test data.
 ```shell
-ksql-datagen bootstrap-server=kafka-broker1:29092 schemaRegistryUrl=schema-registry:8081 schema=./userprofile.avro value-format=json key=userid topic=userprofile maxInterval=5000 iterations=10
+ksql-datagen bootstrap-server=kafka-broker1:29092,kafka-broker2:29192 \
+             schemaRegistryUrl=schema-registry:8081 \
+             schema=./userprofile.avro \
+             value-format=json \
+             key=userid \
+             topic=userprofile \
+             iterations=10 \
+             maxInterval=5000
 ```
+- iterations: number of rows
+- maxInterval: max time in ms between rows
+- nThreads: number of producer threads to start
+- msgRate: rate to produce in msgs/second
+
 where as `userprofile.avro` is:
 ```json
 {
