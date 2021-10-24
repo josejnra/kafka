@@ -134,6 +134,11 @@ Before deleting a stream make sure you have terminated all the queries that are 
 ksql> drop stream stream_name;
 ```
 
+### Create Table
+```shell
+ksql> CREATE TABLE userprofile_table (userid VARCHAR PRIMARY KEY, firstName VARCHAR, lastname VARCHAR) WITH (KAFKA_TOPIC='userprofile', VALUE_FORMAT='json');
+```
+
 ### Print events from stream
 ```shell
 ksql> print stream_name;
