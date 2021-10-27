@@ -4,7 +4,7 @@ from uuid import uuid1
 
 from confluent_kafka import Producer
 
-producer = Producer({'bootstrap.servers': 'localhost:29092'})
+producer = Producer({'bootstrap.servers': 'localhost:9092,localhost:9192'})
 
 
 def user_messsage(size: int) -> bytes:
@@ -68,4 +68,4 @@ def confluent_producer_sync(topic_name: str, size: int = 1000000):
 
 
 if __name__ == '__main__':
-    confluent_producer_sync('locations', 10000)
+    confluent_producer_sync('locations', 10)
