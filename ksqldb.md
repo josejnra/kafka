@@ -100,7 +100,15 @@ SET 'ksql.query.pull.table.scan.enabled'='true';
 SELECT * from ridersNearMountainView WHERE distanceInMiles <= 10;
 ```
 ### Persistent Query
+Use the `CREATE STREAM AS SELECT` statement to create a persistent query stream from an existing stream.
+
+`CREATE STREAM AS SELECT` creates a stream that contains the results from a `SELECT` query. ksqlDB persists the `SELECT` query results into a corresponding new topic. A stream created this way represents a persistent, continuous, streaming query, which means that it runs until you stop it explicitly.
 ```shell
+CREATE STREAM pageviews_intro WITH 
+      (KAFKA_TOPIC='pageviews_avro', REPLICAS=1, PARTITIONS=1, VALUE_FORMAT='AVRO') AS
+      SELECT * FROM pageviews
+      WHERE pageid < 'Page_20'
+      EMIT CHANGES;
 ```
 
 ### Populate Stream
@@ -140,6 +148,11 @@ ksql> CREATE TABLE userprofile_table (userid VARCHAR PRIMARY KEY, firstName VARC
 ```
 
 ### Print events from stream
+```shell
+ksql> print stream_name;
+```
+
+### Kafka Connector Source
 ```shell
 ksql> print stream_name;
 ```
