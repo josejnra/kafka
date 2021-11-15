@@ -161,8 +161,9 @@ ksql> print stream_name;
 Inside ksql-datagen run the following command to generate synthetic test data.
 ```shell
 ksql-datagen bootstrap-server=kafka-broker1:29092,kafka-broker2:29192 \
-             schemaRegistryUrl=schema-registry:8081 \
+             schemaRegistryUrl=http://schema-registry:8081 \
              schema=./userprofile.avro \
+             key-format=json \
              value-format=json \
              key=userid \
              topic=userprofile \

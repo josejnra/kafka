@@ -112,5 +112,179 @@ Even if the dead letter topic contains the records that failed, it does not show
 errors.deadletterqueue.context.headers.enable = true
 ```
 
+## Examples
+### Generating random data
+First, we must install the right plugin, Datagen Source Connector:
+```shell
+confluent-hub install confluentinc/kafka-connect-datagen:0.5.2
+```
+Create a config file `/tmp/userprofile.avro` with the following content on Kafka Connect Server:
+```json
+{
+  "name": "userprofile",
+  "type": "record",
+  "fields": [
+    {
+      "name": "userid",
+      "type": {
+        "type": "long",
+        "arg.properties": {
+          "iteration": {
+            "start": 1000,
+            "step": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "firstname",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "Alice",
+            "Bob",
+            "Carol",
+            "Dan",
+            "Eve",
+            "Frank",
+            "Grace",
+            "Heidi",
+            "Ivan"
+          ]
+        }
+      }
+    },
+    {
+      "name": "lastname",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "Smith",
+            "Jones",
+            "Coen",
+            "Fawcett",
+            "Edison",
+            "Jones",
+            "Dotty"
+          ]
+        }
+      }
+    },
+    {
+      "name": "countrycode",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "AU",
+            "IN",
+            "GB",
+            "US"
+          ]
+        }
+      }
+    },
+    {
+      "name": "rating",
+      "type": {
+        "type": "float",
+        "arg.properties": {
+          "options": [
+            3.4,
+            3.9,
+            2.2,
+            4.4,
+            3.7,
+            4.9
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+Then, create the following connector `userprofile-connector.json`:
+```json
+{
+  "name": "users-generator",
+  "config": {
+    "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+    "name": "users-generator",
+    "schema.filename": "/tmp/userprofile.avro",
+    "schema.keyfield": "userid",
+    "kafka.topic": "userprofile",
+    "max.interval": "10000",
+    "iterations": "1000000",
+    "tasks.max": "1",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schemas.enable": "true",
+    "value.converter.schema.registry.url": "http://schema-registry:8081"
+  }
+}
+```
+Then, just submit:
+```shell
+curl -X POST -H "Content-Type: application/json" --data @userprofile-connector.json http://kafka-connect:8083/connectors
+```
+In this connector of type source we generate random data using schema registry to serialize the event's value with Avro.
+
+### Sink MinIO (S3)
+First, the plugin must be installed on the Kafka Connect cluster. This can be achieved by running:
+```shell
+confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.3
+```
+The S3 sink configuration content could be as following, `minio.json`:
+```json
+{
+  "name": "minio-sink",
+  "config": {
+    "name": "minio-sink",
+    "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+    "tasks.max": "1",
+    "topics": "userprofile",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "key.converter.schemas.enable": "false",
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schemas.enable": "false",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "userprofile-sink-errors",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true",
+    "schema.compatibility": "FORWARD",
+    "s3.bucket.name": "test",
+    "flush.size": "3",
+    "rotate.interval.ms": "10000",
+    "format.class": "io.confluent.connect.s3.format.parquet.ParquetFormat",
+    "aws.access.key.id": "minioadmin",
+    "aws.secret.access.key": "minioadmin",
+    "s3.path.style.access.enabled": "true",
+    "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+    "topics.dir": " ",
+    "store.url": "http://minio:9000",
+    "partitioner.class": "io.confluent.connect.storage.partitioner.TimeBasedPartitioner",
+    "partition.duration.ms": "3600000",
+    "path.format": "'year'=YYYY/'month'=MM/'day'=dd/'hour'=HH",
+    "locale": "en-US",
+    "timezone": "UTC",
+    "timestamp.extractor": "Record"
+  }
+}
+```
+Then, just submit:
+```shell
+curl -X POST -H "Content-Type: application/json" --data '{"name": "local-file-sink", "config": {"connector.class":"FileStreamSinkConnector", "tasks.max":"1", "file":"test.sink.txt", "topics":"connect-test" }}' http://kafka-connect:8083/connectors
+# Or, to use a file containing the JSON-formatted configuration
+# curl -X POST -H "Content-Type: application/json" --data @minio.json http://kafka-connect:8083/connectors
+# update
+# curl -X PUT -H "Content-Type: application/json" --data @minio.json http://kafka-connect:8083/connectors/minio-sink/config
+```
+
 ## Referencies
 - [Kafka Connect](https://docs.confluent.io/platform/current/connect/index.html)
+- [Easy Ways to Generate Test Data in Kafka](https://www.confluent.de/blog/easy-ways-generate-test-data-kafka/)
+- [Datagen Source Connector for Confluent Platform](https://docs.confluent.io/kafka-connect-datagen/current/index.html)
