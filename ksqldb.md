@@ -152,11 +152,6 @@ ksql> CREATE TABLE userprofile_table (userid VARCHAR PRIMARY KEY, firstName VARC
 ksql> print stream_name;
 ```
 
-### Kafka Connector Source
-```shell
-ksql> print stream_name;
-```
-
 ## Data Generator
 Inside ksql-datagen run the following command to generate synthetic test data.
 ```shell
@@ -269,4 +264,4 @@ where as `userprofile.avro` is:
 - [Events](https://docs.ksqldb.io/en/latest/concepts/events/)
 - [Streams](https://docs.ksqldb.io/en/latest/concepts/streams/)
 - [Tables](https://docs.ksqldb.io/en/latest/concepts/tables/)
-- 
+ 

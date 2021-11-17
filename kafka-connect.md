@@ -118,7 +118,7 @@ First, we must install the right plugin, Datagen Source Connector:
 ```shell
 confluent-hub install confluentinc/kafka-connect-datagen:0.5.2
 ```
-Create a config file `/tmp/userprofile.avro` with the following content on Kafka Connect Server:
+Create a config file `/tmp/userprofile.avro` with the following content on Kafka Connect server, where is defined how to generate each event's attribute:
 ```json
 {
   "name": "userprofile",
@@ -205,7 +205,7 @@ Create a config file `/tmp/userprofile.avro` with the following content on Kafka
   ]
 }
 ```
-Then, create the following connector `userprofile-connector.json`:
+Then, define the following connector configuration, `userprofile-connector.json`:
 ```json
 {
   "name": "users-generator",
@@ -232,11 +232,11 @@ curl -X POST -H "Content-Type: application/json" --data @userprofile-connector.j
 In this connector of type source we generate random data using schema registry to serialize the event's value with Avro.
 
 ### Sink MinIO (S3)
-First, the plugin must be installed on the Kafka Connect cluster. This can be achieved by running:
+First, the plugin must be installed on the Kafka Connect server. This can be achieved by running:
 ```shell
 confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.3
 ```
-The S3 sink configuration content could be as following, `minio.json`:
+The S3 sink configuration content could be as follows, `minio.json`:
 ```json
 {
   "name": "minio-sink",
