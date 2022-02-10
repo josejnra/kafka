@@ -113,6 +113,28 @@ errors.deadletterqueue.context.headers.enable = true
 ```
 
 ## Examples
+### Postgres Source Connector
+Make sure to have a postgres db with CDC configured.
+Then, just submit the above source connector with:
+```shell
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d '{
+  "name": "source-connector",
+  "config": {
+      "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+      "plugin.name": "pgoutput",
+      "tasks.max": "1",
+      "database.hostname": "postgres",
+      "database.port": "5432",
+      "database.user": "postgres",
+      "database.password": "root",
+      "database.dbname" : "transportadora",
+      "database.server.name": "dbserver1",
+      "schema.whitelist": "public"
+      }
+ }'
+```
+For each table will be created a topic.
+
 ### Generating random data
 First, we must install the right plugin, Datagen Source Connector:
 ```shell

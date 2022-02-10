@@ -157,7 +157,8 @@ services:
       - |
         echo "Installing Connector"
         confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.5.2
-        confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.3
+        confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.0.5
+        confluent-hub install --no-prompt debezium/debezium-connector-postgresql:1.7.1
         #
         echo "Launching Kafka Connect worker"
         /etc/confluent/docker/run
@@ -238,10 +239,24 @@ services:
   # minioadmin:minioadmin
 
   postgres:
-    image: postgres:14.0
+    image: postgres:14.1
     container_name: postgres
     networks:
       - kafka
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    command: postgres -c log_min_error_statement=fatal -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=1
+
+  pgadmin:
+    image: dpage/pgadmin4:6.4
+    container_name: kafka-pgadmin
+    networks:
+      - kafka
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - 8080:80
