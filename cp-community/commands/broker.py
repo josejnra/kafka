@@ -4,7 +4,7 @@ from uuid import uuid1
 
 
 import click
-from confluent_kafka import Producer
+from confluent_kafka import Producer, Consumer
 from confluent_kafka.admin import AdminClient
 
 
@@ -46,6 +46,58 @@ def describe_topic(topic_name: str):
 
 
 @click.group()
+def consumer():
+    """
+        Commands to consume messages
+    """
+
+
+kafka.add_command(consumer)
+
+
+@consumer.command()
+@click.option("--topic-name", "-t", help="Topic name to consume messages.", required=True)
+@click.option("--offset", "-o",
+              type=click.Choice(['earliest', 'latest']),
+              default="latest",
+              help="Offset type.",
+              show_default=True)
+@click.option("--group-id", "-g", default="mygroup", help="Group id.", show_default=True)
+def consume_messages(topic_name: str, offset: str, group_id: str):
+    consumer_config = {
+            "group.id": group_id,
+            "auto.offset.reset": offset,
+        }
+
+    consumer_config.update(**CONF)
+    consumer = Consumer(consumer_config)
+
+    consumer.subscribe([topic_name])
+    for msg in consume(consumer, 1.0):
+        click.echo(msg.topic())
+        click.echo(msg.partition())
+        click.echo(msg.offset())
+        click.echo(msg.key().decode('utf-8'))
+        click.echo(msg.value().decode('utf-8'))
+
+
+def consume(consumer: Consumer, timeout):
+    try:
+        while True:
+            message = consumer.poll(timeout)
+            if message is None:
+                continue
+            if message.error():
+                click.echo("Consumer error: {}".format(message.error()))
+                continue
+            yield message
+    except Exception as e:
+        click.echo(e)
+    finally:
+        consumer.close()
+
+
+@click.group()
 def producer():
     """
         Commands to produce messages
@@ -56,14 +108,14 @@ kafka.add_command(producer)
 
 
 @producer.command()
-@click.option("--topic-name", "-t", help="Topic name send events.", required=True)
+@click.option("--topic-name", "-t", help="Topic name send messages.", required=True)
 @click.option("--count", "-c", default=10, help="Number of messages to produce.", show_default=True)
 def users(topic_name: str, count: int):
     send_message(topic_name, "user", count)
 
 
 @producer.command()
-@click.option("--topic-name", "-t", help="Topic name to send events.", required=True)
+@click.option("--topic-name", "-t", help="Topic name to send messages.", required=True)
 @click.option("--count", "-c", default=10, help="Number of messages to produce.", show_default=True)
 def locations(topic_name: str, count: int):
     send_message(topic_name, "location", count)
