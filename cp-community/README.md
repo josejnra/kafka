@@ -1,5 +1,5 @@
 ## Docker Compose
-The defined [docker-compose.yaml](docker-compose.yaml) has the following services:
+The defined [docker-compose.yaml](../cp-community/docker-compose.yaml) has the following services:
 
 - zookeeper
 - kafka-broker1
@@ -14,9 +14,3 @@ The defined [docker-compose.yaml](docker-compose.yaml) has the following service
 - minio
 - postgres
 - pgadmin
-
-## CLI
-In order to run the CLI just execute the following command:
-```shell
-python cli.py
-```

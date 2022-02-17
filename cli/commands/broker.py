@@ -59,7 +59,7 @@ def describe_topic(topic_name: str):
 @click.group()
 def consumer():
     """
-        Commands to consume messages
+        Commands for consumer client
     """
 
 
@@ -75,6 +75,9 @@ kafka.add_command(consumer)
               show_default=True)
 @click.option("--group-id", "-g", default="mygroup", help="Group id.", show_default=True)
 def consume_messages(topic_name: str, offset: str, group_id: str):
+    """
+        Consume messages from a topic
+    """
     consumer_config = {
             "group.id": group_id,
             "auto.offset.reset": offset,
@@ -111,7 +114,7 @@ def consume(consumer: Consumer, timeout):
 @click.group()
 def producer():
     """
-        Commands to produce messages
+        Commands for producer client
     """
 
 
@@ -119,16 +122,22 @@ kafka.add_command(producer)
 
 
 @producer.command()
-@click.option("--topic-name", "-t", help="Topic name send messages.", required=True)
-@click.option("--count", "-c", default=10, help="Number of messages to produce.", show_default=True)
+@click.option("--topic-name", "-t", help="Topic name to send users events.", required=True)
+@click.option("--count", "-c", default=10, help="Number of events to produce.", show_default=True)
 def users(topic_name: str, count: int):
+    """
+        Produce users events
+    """
     send_message(topic_name, "user", count)
 
 
 @producer.command()
-@click.option("--topic-name", "-t", help="Topic name to send messages.", required=True)
-@click.option("--count", "-c", default=10, help="Number of messages to produce.", show_default=True)
+@click.option("--topic-name", "-t", help="Topic name to locations events.", required=True)
+@click.option("--count", "-c", default=10, help="Number of events to produce.", show_default=True)
 def locations(topic_name: str, count: int):
+    """
+        Produce locations events
+    """
     send_message(topic_name, "location", count)
 
 
