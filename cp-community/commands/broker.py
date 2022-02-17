@@ -5,8 +5,7 @@ from uuid import uuid1
 
 import click
 from confluent_kafka import Producer, Consumer
-from confluent_kafka.admin import AdminClient
-
+from confluent_kafka.admin import AdminClient, NewTopic
 
 CONF = {
     "bootstrap.servers": "localhost:9092,localhost:9192"
@@ -16,7 +15,7 @@ CONF = {
 @click.group()
 def kafka():
     """
-        Commands on kafka brokers
+        Commands to run against kafka brokers
     """
 
 
@@ -29,6 +28,18 @@ def list_topics(topic_name: str):
     kadmin = AdminClient(CONF)
     for topic in kadmin.list_topics(topic=topic_name).topics:
         click.echo(topic)
+
+
+@kafka.command()
+@click.option("--topic-name", "-t", help="Topic name to be created.", required=True)
+@click.option("--num-partitions", "-p", type=int, default=2, help="Number of partitions.", show_default=True)
+@click.option("--replication-factor", "-r", type=int, default=2, help="Replication factor.", show_default=True)
+def create_topic(topic_name: str, num_partitions: int, replication_factor: int):
+    """
+        Create topic
+    """
+    topic_list = [NewTopic(topic=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
+    AdminClient(CONF).create_topics(new_topics=topic_list)
 
 
 @kafka.command()
