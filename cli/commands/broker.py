@@ -8,7 +8,8 @@ from confluent_kafka import Producer, Consumer
 from confluent_kafka.admin import AdminClient, NewTopic
 
 CONF = {
-    "bootstrap.servers": "localhost:9092,localhost:9192"
+    "bootstrap.servers": "localhost:9092,localhost:9192",
+    # "debug": "broker,admin,protocol"
 }
 
 
@@ -23,7 +24,9 @@ def kafka():
 @click.option("--topic-name", "-t", help="Topic name to describe.")
 def list_topics(topic_name: str):
     """
-        List topics
+        List topics.
+        Warning: If auto.create.topics.enable is set to true on the broker and an unknown topic is specified,
+            it will be created.
     """
     kadmin = AdminClient(CONF)
     for topic in kadmin.list_topics(topic=topic_name).topics:
@@ -40,6 +43,15 @@ def create_topic(topic_name: str, num_partitions: int, replication_factor: int):
     """
     topic_list = [NewTopic(topic=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
     AdminClient(CONF).create_topics(new_topics=topic_list)
+
+
+@kafka.command()
+@click.option("--topic-name", "-t", help="Topic name to be deleted.", required=True)
+def delete_topic(topic_name: str):
+    """
+        Create topic
+    """
+    AdminClient(CONF).delete_topics([topic_name])
 
 
 @kafka.command()
@@ -73,7 +85,7 @@ kafka.add_command(consumer)
               default="latest",
               help="Offset type.",
               show_default=True)
-@click.option("--group-id", "-g", default="mygroup", help="Group id.", show_default=True)
+@click.option("--group-id", "-g", default="my-group", help="Group id.", show_default=True)
 def consume_messages(topic_name: str, offset: str, group_id: str):
     """
         Consume messages from a topic

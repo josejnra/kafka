@@ -2,7 +2,7 @@ import click
 
 from commands.broker import kafka
 from commands.ksqldb import ksqldb
-from commands.rest import rest_proxy
+from commands.rest_proxy import rest_proxy
 
 
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))

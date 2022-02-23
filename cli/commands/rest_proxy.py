@@ -53,6 +53,7 @@ def create_topic(cluster_id: str, topic_name: str, num_partitions: int, configs:
 
 
 @rest_proxy.command()
+@click.option("--topic-name", "-t", type=str, help="Topic name.", required=True)
 def produce(topic_name: str):
     """
         Send message
