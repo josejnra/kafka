@@ -11,6 +11,7 @@ Schema Registry is a distributed storage layer for schemas which uses Kafka as i
 - Kafka provides the durable backend, and functions as a write-ahead changelog for the state of Schema Registry and the schemas it contains.
 - Schema Registry is designed to be distributed, with single-primary architecture, and ZooKeeper/Kafka coordinates primary election (based on the configuration).
 
+An alternative to confluent schema registry is [Karapace](https://aiven.io/blog/aiven-launches-karapace-for-kafka-schema-and-cluster-management#:~:text=Open%20mic-,Aiven%20launches%20Karapace%20for%20Kafka%20Schema%20and%20cluster%20management,Schema%20Registry%20and%20Kafka%20REST). An open source solution.
 ## Schemas, Subjects, and Topics
 A Kafka topic contains messages, and each message is a key-value pair. Either the message key or the message value, or both, can be serialized as Avro, JSON, or Protobuf. A schema defines the structure of the data format. The Kafka topic name can be independent of the schema name. Schema Registry defines a scope in which schemas can evolve, and that scope is the subject. The name of the subject depends on the configured subject name strategy, which by default is set to derive subject name from topic name.
 
