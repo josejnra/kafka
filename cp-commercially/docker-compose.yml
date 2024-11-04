@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
+    image: confluentinc/cp-zookeeper:7.7.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker1:
-    image: confluentinc/cp-server:7.4.0
+    image: confluentinc/cp-server:7.7.1
     hostname: broker1
     container_name: broker1
     ports:
@@ -42,7 +42,7 @@ services:
       - zookeeper
 
   broker2:
-    image: confluentinc/cp-server:7.4.0
+    image: confluentinc/cp-server:7.7.1
     hostname: broker2
     container_name: broker2
     ports:
@@ -71,7 +71,7 @@ services:
       - zookeeper
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.4.0
+    image: confluentinc/cp-schema-registry:7.7.1
     hostname: schema-registry
     container_name: schema-registry
     ports:
@@ -85,7 +85,7 @@ services:
       - broker2
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:7.4.0
+    image: confluentinc/cp-enterprise-control-center:7.7.1
     hostname: control-center
     container_name: control-center
     ports:
@@ -107,7 +107,7 @@ services:
       - ksqldb-server
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:7.4.0
+    image: confluentinc/cp-ksqldb-server:7.7.1
     hostname: ksqldb-server
     container_name: ksqldb-server
     ports:
@@ -130,7 +130,7 @@ services:
       - broker2
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:7.4.0
+    image: confluentinc/cp-ksqldb-cli:7.7.1
     container_name: ksqldb-cli
     entrypoint: /bin/sh
     tty: true
